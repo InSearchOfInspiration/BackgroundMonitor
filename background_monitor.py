@@ -22,7 +22,7 @@ class BackgroundMonitor:
     def __update(self):
         print('__update')
         delta = self.__ping()
-        # self.__stopped = True
+
         if not self.__stopped:
             if delta > self.__PROCESS_PING_INTERVAL:
                 self.__timer = Timer(0.0, self.__update).start()
@@ -47,13 +47,12 @@ class BackgroundMonitor:
             for j in id_w.stdout:
                 if 'WM_ICON_NAME(STRING)'.encode('utf-8') in j:
                     if title != j.split()[2]:
-                        title = j.split()[2]
-                        print("current window title: %s" % title)
+                        title = j.split()[2].decode('utf-8')[1:]
 
                 if '_NET_WM_PID(CARDINAL)'.encode('utf-8') in j:
                     pid = j.split()[2]
 
         if pid is not 0 and title is not None:
-            self.__db.update(pid, title)
+            self.__db.update(int(pid), str(title))
 
         return time_before_ping - time.time()
