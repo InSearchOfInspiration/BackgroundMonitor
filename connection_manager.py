@@ -20,7 +20,7 @@ class ConnectionManager:
         })
         header = {'Accept': 'application/json'}
 
-        r = requests.post(self.__server_url+'/auth', data=data, header=header)
+        r = requests.post(self.__server_url+'/login/', data=data, header=header)
         r = json.loads(r.text)
 
         if r['token'] is not None:

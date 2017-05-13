@@ -22,7 +22,7 @@ class BackgroundMonitor:
     def __update(self):
         print('__update')
         delta = self.__ping()
-
+        # self.__stopped = True
         if not self.__stopped:
             if delta > self.__PROCESS_PING_INTERVAL:
                 self.__timer = Timer(0.0, self.__update).start()
