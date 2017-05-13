@@ -1,15 +1,27 @@
-from pymongo import MongoClient
+import time
+import models
 
 
 class Database:
-    def __init__(self, host='localhost', post=5005):
-        self.__client = MongoClient(post, host)
-        self.__db = self.__client['background-monitor-database']
+    def __init__(self):
+        self.__last_updated_event_id = None
 
-    def update(self, pid, title):
-        collection = self.__db['events']
+    def update(self, pid, name):
+        events = models.Event.objects.raw({'pid': pid, 'name': name})
 
-        result = collection.find({'pid': pid, 'title': title})
+        if events.count() is not 0:
+            for event in events:
+                if event.id == self.__last_updated_event_id:
+                    event.finish_date = time.time()
+                    event.save()
+                    break
+                else:
+                    self.__create_event(pid, name)
+        else:
+            self.__create_event(pid, name)
 
-        if result is None:
-            pass
+    def __create_event(self, pid, name):
+        time_now = time.time()
+        event = models.Event(name, pid, time_now, time_now).save()
+
+        self.__last_updated_event_id = event.id
