@@ -4,7 +4,7 @@ from threading import Timer
 
 
 class BackgroundMonitor:
-    __PROCESS_PING_INTERVAL = 1.0
+    __PROCESS_PING_INTERVAL = 5.0
 
     def __init__(self, db):
         self.__db = db
@@ -13,14 +13,12 @@ class BackgroundMonitor:
         self.__stopped = False
 
     def run(self):
-        print('run')
         self.__timer.start()
 
     def stop(self):
         self.__stopped = True
 
     def __update(self):
-        print('__update')
         delta = self.__ping()
         # self.__stopped = True
         if not self.__stopped:
@@ -30,7 +28,6 @@ class BackgroundMonitor:
                 self.__timer = Timer(self.__PROCESS_PING_INTERVAL-delta, self.__update).start()
 
     def __ping(self):
-        print('__ping')
         time_before_ping = time.time()
         root = Popen(['xprop', '-root'], stdout=PIPE)
         title = ''
@@ -52,7 +49,7 @@ class BackgroundMonitor:
                 if '_NET_WM_PID(CARDINAL)'.encode('utf-8') in j:
                     pid = j.split()[2]
 
-        if pid is not 0 and title is not None:
+        if pid is not 0 and pid is not None and title is not None:
             self.__db.update(int(pid), str(title))
 
         return time_before_ping - time.time()

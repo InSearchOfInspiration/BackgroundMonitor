@@ -26,12 +26,18 @@ class Database:
 
     def __create_event(self, pid, name):
         result = ProcessAnalyzer.analyze(pid)
-        if result is not None:
-            pass
+        category_id = None
+
+        if result is not None and 'name' in result:
+            category_id = self.__connection_manager.get_category(result['name'])
 
         if name is not None and name.replace(' ', '') is not '':
             time_now = time.time()
-            event = models.Event(name, pid, time_now, time_now).save()
+            event = models.Event(name, pid, time_now, time_now)
 
+            if category_id is not None:
+                event.category = {'name': result['name'], 'id': category_id}
+
+            event.save()
             self.__last_updated_event_id = event.id
             self.__connection_manager.post_event(event.json_representation())

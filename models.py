@@ -2,8 +2,6 @@ from pymodm import MongoModel, fields
 from config import DB_URL
 from pymodm import connect
 import json
-from bson import json_util
-# from marshmallow import Schema, fields, validate
 
 print("URL:", DB_URL)
 connect(DB_URL)
@@ -18,10 +16,10 @@ class Event(MongoModel):
 
     def json_representation(self):
         result = {}
-        # if self.category is not None:
-        #     if self.category['id'] is not None \
-        #             and self.category['name'] is not None:
-        #         result['category'] = self.category
+        if 'id' in self.category \
+                and 'name' in self.category:
+
+            result['category'] = self.category
 
         result['start_date'] = self.start_date.isoformat()
         result['finish_date'] = self.finish_date.isoformat()
