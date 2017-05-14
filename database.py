@@ -4,8 +4,9 @@ from process_analyzer import ProcessAnalyzer
 
 
 class Database:
-    def __init__(self):
+    def __init__(self, connection_manager):
         self.__last_updated_event_id = None
+        self.__connection_manager = connection_manager
 
     def update(self, pid, name):
         events = models.Event.objects.raw({'pid': pid, 'name': name})
@@ -33,3 +34,4 @@ class Database:
             event = models.Event(name, pid, time_now, time_now).save()
 
             self.__last_updated_event_id = event.id
+            self.__connection_manager.post_event(event.json_representation())

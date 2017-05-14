@@ -3,8 +3,9 @@ import json
 
 
 class ConnectionManager:
-    __USER_NAME = ''
-    __PASSWORD = ''
+    # TODO delete hardcore
+    __USER_NAME = 'username'
+    __PASSWORD = 'ololo'
 
     def __init__(self, server_url):
         self.__server_url = server_url
@@ -18,22 +19,22 @@ class ConnectionManager:
             'username': self.__USER_NAME,
             'password': self.__PASSWORD
         })
-        header = {'Accept': 'application/json'}
 
-        r = requests.post(self.__server_url+'/login/', data=data, header=header)
-        r = json.loads(r.text)
+        r = requests.post(self.__server_url+'/login', json=data)
 
-        if r['token'] is not None:
-            self.__token = r['token']
-            self.__authorized = True
-            result = True
+        if r.status_code is 200:
+            r = json.loads(r.text)
+
+            if r['access_token'] is not None:
+                self.__token = r['access_token']
+                self.__authorized = True
+                result = True
 
         return result
 
-    def post_event(self, event):
+    def post_event(self, event_json):
         if self.__authorized:
-            data = json.dumps(event)
-            header = {'Accept': 'application/json'}
-            r = requests.post(self.__server_url, data=data, header=header)
+            headers = {'Authorization': 'JWT ' + self.__token}
+            r = requests.post(self.__server_url+'/events/new', json=event_json, headers=headers)
         else:
             self.authorize()
